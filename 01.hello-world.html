@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>01 Hello World</title>
+</head>
+<body>
+    <div id="app">
+        <!--a app será renderizada aqui-->
+    </div>
+    
+    <!-- react local files -->
+    <script src="react/build/react.js"></script>
+    <script src="react/build/react-dom.js"></script>
+
+    <!-- Load React. -->
+    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+    <!--
+        <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    -->
+
+    <script>
+        //criando um componente
+        var Component = React.createClass({
+            render: function() {
+                return React.DOM.span(null, "I'm so custom");
+            }
+        });
+
+        //Factory
+        var ComponentFactory = React.createFactory(Component);
+
+        //Componente com Propriedades
+        var Component2 = React.createClass({
+            render: function(){
+                return React.DOM.span(null, "My name is " + this.props.name);
+            }
+        });
+
+        var Component3 = React.createClass({
+            propTypes: {
+                name: React.PropTypes.string.isRequired
+            },
+            render: function () {
+                return React.DOM.span(null, "My name is " + this.props.name);
+            }
+        });
+
+        var Component4 = React.createClass({
+            propTypes: {
+                firstName: React.PropTypes.string.isRequired,
+                middleName: React.PropTypes.string,
+                familyName: React.PropTypes.string.isRequired,
+                address: React.PropTypes.string
+            },
+            getDefaultProps: function () {
+                return{
+                    middleName: '',
+                    address: 'n/a',
+                }
+            },
+            render: function () {
+                return React.DOM.span(null, "My name is " 
+                    + this.props.firstName 
+                    + " and My familyName is " 
+                    + this.props.familyName
+                    + " and I live in "
+                    + this.props.address);
+            }
+        });
+
+        var TextAreaCounter = React.createClass({
+            _log: function(methodName, args){
+                console.log(methodName, args);
+            },
+            
+            componentWillUpdate: function(){
+                this._log('componentWillUpdate', arguments);
+                console.log(this.state.text.length);
+            },
+            componentDidUpdate: function(oldProps, oldState){
+                this._log('componentDidUpdate', arguments);
+                if(this.state.text.length > 7){
+                    this.replaceState(oldState);
+                }
+                console.log(this.state.text.length);
+            },
+            componentWillMount: function(){
+                this._log('componentWillMount', arguments);
+                console.log(this.state.text.length);
+            },
+            componentDidMount: function(){
+                this._log('componentDidMount', arguments);
+                console.log(this.state.text.length);
+            },
+            componentWillUnmount: function(){
+                this._log('componentWillUnmount', arguments);
+                console.log(this.state.text.length);
+            },
+            
+
+            propTypes: {
+                initialValue: React.PropTypes.string
+            },
+            getDefaultProps: function () {
+                return{
+                    initialValue: '',
+                }
+            },
+            getInitialState: function(){
+                return {
+                    text: this.props.initialValue
+                }
+            },
+            _textChange: function(ev){
+                this.setState({
+                    text: ev.target.value,
+                });
+            },
+            componentWillReceiveProps: function(newProps){
+                this.setState({
+                    text: newProps.initialValue,
+                });
+            },
+            render: function (){
+                return React.DOM.div(null, 
+                React.DOM.textarea({
+                    value: this.state.text,
+                    onChange: this._textChange,
+                }),
+                React.DOM.h3(null, this.state.text.length)
+                );
+            }
+        });
+
+
+
+        //código da minha app aqui
+        var myTextCounter = ReactDOM.render(
+            React.createElement(TextAreaCounter, {
+                initialValue: 'Marcio'
+            }), 
+            document.getElementById("app")
+        );
+    </script>
+</body>
+</html>
