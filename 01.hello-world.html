@@ -23,6 +23,17 @@
     -->
 
     <script>
+        //Array para cabeçalho
+        var headers = ["Nome", "Sobrenome", "Profissao"];
+
+        var data = [["Marcio","Sarabando","Dev"],
+        ["Cassia","Cristina","Adm"],
+        ["Iza","Sarabando","Vet"],
+        ["Sofia","Sarabando","Furona"]];
+
+        //Array de dados
+
+
         //criando um componente
         var Component = React.createClass({
             render: function() {
@@ -136,15 +147,160 @@
             }
         });
 
+        //Exemplo usando do Mixin
+        var logMixin = {
+            _log: function(methodName, args){
+                console.log(methodName, args);
+            },
+            
+            componentWillUpdate: function(){
+                this._log('componentWillUpdate', arguments);
+                console.log(this.state.text.length);
+            },
+            componentDidUpdate: function(oldProps, oldState){
+                this._log('componentDidUpdate', arguments);
+                if(this.state.text.length > 7){
+                    this.replaceState(oldState);
+                }
+                console.log(this.state.text.length);
+            },
+            componentWillMount: function(){
+                this._log('componentWillMount', arguments);
+                console.log(this.state.text.length);
+            },
+            componentDidMount: function(){
+                this._log('componentDidMount', arguments);
+                console.log(this.state.text.length);
+            },
+            componentWillUnmount: function(){
+                this._log('componentWillUnmount', arguments);
+                console.log(this.state.text.length);
+            },
+            componentWillReceiveProps: function(newProps){
+                this.setState({
+                    text: newProps.initialValue,
+                });
+            },
+        };
+
+        //Componente usando o Mixin
+        var textAreaWithLogMixin = React.createClass({
+            name: 'TextCounter',
+            mixins: [logMixin],
+            propTypes: {
+                initialValue: React.PropTypes.string
+            },
+            getDefaultProps: function () {
+                return{
+                    initialValue: '',
+                }
+            },
+            getInitialState: function(){
+                return {
+                    text: this.props.initialValue
+                }
+            },
+            _textChange: function(ev){
+                this.setState({
+                    text: ev.target.value,
+                });
+            },
+            componentWillReceiveProps: function(newProps){
+                this.setState({
+                    text: newProps.initialValue,
+                });
+            },
+            render: function (){
+                return React.DOM.div(null, 
+                React.DOM.textarea({
+                    value: this.state.text,
+                    onChange: this._textChange,
+                }),
+                React.DOM.h3(null, this.state.text.length)
+                );
+            }
+        });
 
 
         //código da minha app aqui
+        // var myTextCounter = ReactDOM.render(
+        //     React.createElement(TextAreaCounter, {
+        //         initialValue: 'Marcio'
+        //     }), 
+        //     document.getElementById("app")
+        // );
+
+        //renderizando o componente com o mixin
+        // var myTextCounter = ReactDOM.render(
+        //     React.createElement(textAreaWithLogMixin, {
+        //         initialValue: 'Marcio'
+        //     }), 
+        //     document.getElementById("app")
+        // );
+
+        var Excel = React.createClass({
+            getInitialState: function() {
+                return { data: this.props.initialData };
+            },
+            componentWillMount: function(){
+                console.log(this.state.data);
+            },
+            render: function(){
+                return (
+                    React.DOM.table(null,
+                        React.DOM.thead(null,
+                            React.DOM.tr(null,
+                                this.props.headers.map(function(title, idx) {
+                                    return React.DOM.th({key: idx}, title);
+                                })
+                            )
+                        ),
+                        React.DOM.tbody(null,
+                            this.state.data.map(function (row, idx){
+                                return(
+                                    React.DOM.tr({key: idx}, 
+                                        row.map(function(cell, idx){
+                                            return React.DOM.td({key: idx}, cell);
+                                        })
+                                    )
+
+                                ) 
+                            })
+                        )
+                    )
+                );
+            }
+        });
+
         var myTextCounter = ReactDOM.render(
-            React.createElement(TextAreaCounter, {
-                initialValue: 'Marcio'
+            React.createElement(Excel, {
+                headers: headers,
+                initialData: data
             }), 
             document.getElementById("app")
         );
     </script>
+    <style>
+       table{
+        background-color: azure;
+        border-collapse: collapse;
+        width: 100%;
+       }
+       td, th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+       td{
+        border: 1px solid #ddd;
+       }
+       th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #04AA6D;
+        color: white;
+        }
+
+    </style>
 </body>
 </html>
